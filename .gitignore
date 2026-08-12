@@ -1,0 +1,24 @@
+# OS生成ファイル
+.DS_Store
+
+# Python実行時のキャッシュ
+__pycache__/
+*.pyc
+
+# Python仮想環境
+.venv/
+
+# 作業用スクラッチディレクトリ
+workings/
+
+# Claude Codeのローカル設定
+.claude/settings.local.json
+
+# 「公用文作成の要領」の原本。
+# 文化庁が公開している一次資料であり、再取得できるため不要。取得方法は README.md を参照。
+source-materials/「公用文作成の考え方」（建議）（付）「公用文作成の考え方（文化審議会建議）」解説.pdf
+source-materials/新しい「公用文作成の要領」に向けて（報告）.pdf
+
+# ビルド生成物
+# package.sh で再生成できるため不要。
+koetsu-skill.zip

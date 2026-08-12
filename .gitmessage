@@ -1,0 +1,21 @@
+<type>(<scope>): <subject>
+
+<body>
+
+# ── コミットメッセージ規約 (Conventional Commits) ──
+# <type>:
+#   feat     - 新機能の追加（新しいルール・チェックの追加など）
+#   fix      - バグ修正
+#   docs     - ドキュメントのみの変更（README.md, SKILL.md等）
+#   test     - テストの追加・修正
+#   refactor - 挙動を変えないコードの整理
+#   chore    - ビルド・設定・依存関係・雑務（.gitignore, pytest.ini等）
+#
+# <scope>: 省略可。変更対象（rules, checks, scripts, tests 等）
+#
+# 例:
+#   feat(checks): 表外音訓チェックを追加
+#   fix(checks): kanji_kana.pyのデータパスを修正
+#   test(common): check_dictionaryのテストを追加
+#   docs: README.mdの手順を更新
+#   chore: .gitignoreにworkings/を追加
