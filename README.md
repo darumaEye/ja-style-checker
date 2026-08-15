@@ -8,6 +8,17 @@
 
 ルール正本（`rule-sources/`）は両プラットフォーム共通。まず `rule-sources/` でルールを編集する。次に `bash scripts/package.sh` を実行する。`claude/references/`・`gemini/knowledge/` の両方に軽量版が生成され、`dist/ja-style-checker.zip` も作られる。そのうえで、使うプラットフォームに応じて以下を行う。
 
+### プログラミング環境なしで使う場合
+
+ルールを編集する予定がなく、そのまま使うだけであれば、`bash scripts/package.sh` を実行しなくてもGitHubの画面だけで導入できる。
+
+1. リポジトリページ右上の緑色の「Code」ボタン→「Download ZIP」でリポジトリ全体をダウンロードする。
+2. ダウンロードしたzipファイルを展開（解凍）する。
+3. **Claude Skillsに登録する場合**：展開したフォルダの中の `claude` フォルダを丸ごと圧縮してzipファイルを作る（Macなら`claude`フォルダを右クリック→「"claude"を圧縮」、Windowsなら右クリック→「送る」→「圧縮(zip形式)フォルダー」）。できたzipファイルをプラットフォームのスキルとして登録する。
+4. **Gemini Gemsに登録する場合**：圧縮は不要。展開したフォルダの中の `gemini/gem_instructions.md` の中身をGemの「指示」欄にコピー＆ペーストし、`gemini/knowledge/koyobun_rules.generated.md`・`gemini/knowledge/company_rules.generated.md` をGemの「知識」欄にアップロードする。
+
+この方法で作ったzip・ファイルの中身は、`bash scripts/package.sh` で生成されるものと同じ。
+
 ### Claude Skills
 
 生成された `dist/ja-style-checker.zip` をプラットフォームのスキルとして登録する。
