@@ -12,6 +12,15 @@
 
 生成された `dist/ja-style-checker.zip` をプラットフォームのスキルとして登録する。
 
+### Claude Code（プラグインマーケットプレイス経由）
+
+`.claude-plugin/marketplace.json` を使って、Claude Codeのプラグインとしてインストールできる。
+
+```
+/plugin marketplace add darumaEye/ja-style-checker
+/plugin install ja-style-checker@ja-style-checker-marketplace
+```
+
 ### Gemini Gems
 
 1. Geminiで新しいGemを作成する。
