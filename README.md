@@ -1,54 +1,75 @@
-# 校閲スキル
+# 日本語スタイルチェッカー（公用文要領ベース）
 
 ## 何をするスキルか
 
-社内文書の日本語表記を、文化審議会の[「報告・答申・建議等」](https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/)ページに掲載されている建議「公用文作成の考え方」（令和4年1月7日）の考え方に基づいて校閲する。要領のルールに加えて、社内独自ルールも追加で適用できる。案件独自ルール・個人ルールは、このリポジトリでは管理しない。Claude Projectのプロジェクト知識に置く運用にしている（詳細は`SKILL.md`の「案件ルール・個人ルールの追加方法」を参照）。詳細な動作仕様は `SKILL.md` を参照。元になったPDFは、 `source-materials/` に置いてある。
+社内文書の日本語表記を、文化審議会の[「報告・答申・建議等」](https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/)ページに掲載されている建議「公用文作成の考え方」（令和4年1月7日）の考え方に基づいて校閲する。要領のルールに加えて、社内独自ルールも追加で適用できる。案件独自ルール・個人ルールは、このリポジトリでは管理しない。Claude Projectのプロジェクト知識に置く運用にしている（詳細は`SKILL.md`の「案件ルール・個人ルールの追加方法」を参照）。詳細な動作仕様は `SKILL.md` を参照。元になったPDFはリポジトリには含まれない。必要であれば `source-materials/` に保管しておくとよい（入手先は `rule-sources/koyobun_rules.md` の出典を参照）。
 
-このスキルは3段階の流れで運用する。①`rule-sources/` でルールを編集する、②`package.sh` でパッケージ化する、③生成された `koetsu-skill.zip` をプラットフォームのスキルとして登録する。
+## Claude・Geminiへの登録手順
+
+ルール正本（`rule-sources/`）は両プラットフォーム共通。まず `rule-sources/` でルールを編集する。次に `bash scripts/package.sh` を実行する。`claude/references/`・`gemini/knowledge/` の両方に軽量版が生成され、`dist/ja-style-checker.zip` も作られる。そのうえで、使うプラットフォームに応じて以下を行う。
+
+### Claude Skills
+
+生成された `dist/ja-style-checker.zip` をプラットフォームのスキルとして登録する。
+
+### Gemini Gems
+
+1. Geminiで新しいGemを作成する。
+2. `gemini/gem_instructions.md` の中身を、Gemの「指示」欄にコピー＆ペーストする。
+3. `gemini/knowledge/koyobun_rules.generated.md`・`gemini/knowledge/company_rules.generated.md` を、Gemの「知識」欄にアップロードする。
 
 ## ファイル構成
 
+まず全体のディレクトリ構成、その後に各ファイルの役割を説明する。
+
+```
+ja-style-checker/
+├── .github/          # GitHub Actions CI設定
+├── rule-sources/     # ルール正本（人間が編集する）
+├── scripts/          # 開発用ツール（テスト・生成・パッケージング）
+├── claude/           # Claude Skills向け（アップロード対象）
+│   ├── references/   #   自動生成のルール軽量版
+│   └── scripts/      #   機械判定層の実装
+├── gemini/           # Gemini Gems向け
+│   └── knowledge/    #   自動生成のルール軽量版
+├── tests/            # pytestテスト一式
+├── samples/          # 動作確認用サンプル
+├── source-materials/ # ルール一次資料の保管先（中身はgitignore、.gitkeepのみ追跡）
+├── workings/         # 作業用スクラッチ（中身はgitignore、.gitkeepのみ追跡）
+├── CHANGELOG.md
+├── pytest.ini
+└── requirements.txt
+```
+
 | ファイル | 役割 |
 |---|---|
+| `.github/workflows/ci.yml` | pytest・blackを実行するGitHub Actions CI設定 |
 | `rule-sources/koyobun_rules.md` | 正本①。要領から抽出したルール一覧。編集はここに対して行う |
 | `rule-sources/company_rules.md` | 正本②。社内独自ルール。編集はここに対して行う |
 | `scripts/make_generated_md.py` | 正本1つから対応する`*.generated.md`を1つ作る変換スクリプト |
 | `scripts/package.sh` | テスト実行・ルール軽量版生成・zip化までを一括で行うパッケージングスクリプト |
-| `scripts/report_test_status.py` | テストの実装状況表（`tests/test_status_report.md`）を生成するスクリプト |
-| `claude/SKILL.md` | スキル本体の手順書。校閲の進め方・出力フォーマットを定義する |
-| `claude/references/koyobun_rules.generated.md` | 自動生成。手動編集しない |
-| `claude/references/company_rules.generated.md` | 自動生成。手動編集しない |
-| `claude/scripts/mechanical_check.py` | 機械判定層のCLIエントリーポイント（Claudeが実行時に呼び出す） |
-| `claude/scripts/checks/` | 機械判定層の実装本体。ルールのカテゴリごとにモジュールが分かれている |
-| `gemini/gem_instructions.md` | Gemini Gem向けの指示書（正本、手書き）。Gemの「指示」欄に貼り付けて使う |
-| `gemini/knowledge/koyobun_rules.generated.md` | 自動生成。Gemの「知識」欄にアップロードする |
-| `gemini/knowledge/company_rules.generated.md` | 自動生成。Gemの「知識」欄にアップロードする |
-| `tests/` | `claude/scripts/`の単体テスト一式（pytest） |
-| `tests/test_status_report.md` | `report_test_status.py`が生成するテスト実装状況表 |
+| `scripts/report_test_status.py` | テストの実装状況表（`tests/TEST_STATUS_REPORT.md`）を生成するスクリプト |
+| `tests/TEST_STATUS_REPORT.md` | `report_test_status.py`が生成するテスト実装状況表 |
+| `source-materials/.gitkeep` | ルール一次資料（要領原本PDF、社内規程等）の保管先。中身はgitignore対象で、ディレクトリ自体だけ追跡している |
+| `workings/.gitkeep` | 作業用スクラッチディレクトリ。中身はgitignore対象で、ディレクトリ自体だけ追跡している |
+| `CHANGELOG.md` | ルール内容（`rule-sources/`）の変更履歴 |
 | `pytest.ini` | pytestの設定（importパス・テスト探索対象） |
 | `requirements.txt` | 開発用のPython依存関係（black, pytest等） |
-| `samples/` | 動作確認用の架空のサンプル文書。スキルの手動テストに使う |
-
-## 正本／自動生成の関係
-
-ルールファイルは「人間が編集する正本」と「Claudeが読む軽量版（自動生成）」に分かれている。軽量版は「機械」区分の行（既にスクリプトで実装済みのため、Claudeが読む必要がない）を取り除いたもの。
-
-命名規則は`<正本のファイル名>.generated.md`。`scripts/make_generated_md.py`がこの名前で自動出力するため、名前のブレは起きない。
 
 ## ルールを更新する手順
 
-1. `rule-sources/koyobun_rules.md`・`rule-sources/company_rules.md`（正本）のいずれかを編集する
-   - `company_rules.md` は現状ほぼ空のテンプレート。社内ルールが定まり次第、カテゴリ別に追記していく
-   - 案件独自ルール・個人ルールはこのリポジトリでは管理しない。Claude Projectのプロジェクト知識に置く運用については`SKILL.md`の「案件ルール・個人ルールの追加方法」を参照
-2. `bash scripts/package.sh` を実行する
-   - `rules/*.generated.md` が再生成される
-   - スキル一式が `koetsu-skill.zip` にまとめられる
-3. 更新された `*.generated.md` と、必要なら `SKILL.md` をプラットフォームのスキルに再アップロードする
-   - `*.generated.md` を手動編集しても、次回`package.sh`実行時に上書きされる。編集は必ず正本に対して行うこと
+ルールファイルは「人間が編集する正本」と「Claude/Geminiが読む軽量版（自動生成）」に分かれている。軽量版は「機械」区分の行（既にスクリプトで実装済みのため、読む必要がない）を取り除いたもの。命名規則は`<正本のファイル名>.generated.md`。`scripts/make_generated_md.py`がこの名前で自動出力するため、名前のブレは起きない。
 
-## 新しいルールファイルを追加する場合
+1. `rule-sources/koyobun_rules.md`・`rule-sources/company_rules.md`（正本）のいずれかを編集する。
+   - `company_rules.md` は現状ほぼ空のテンプレート。社内ルールが定まり次第、カテゴリ別に追記していく。
+   - 案件独自ルール・個人ルールはこのリポジトリでは管理しない。Claude Projectのプロジェクト知識に置く運用については`SKILL.md`の「案件ルール・個人ルールの追加方法」を参照。
+2. `bash scripts/package.sh` を実行する。
+   - `*.generated.md` が再生成される（`claude/references/`・`gemini/knowledge/`の両方）。
+   - スキル一式が `dist/ja-style-checker.zip` にまとめられる。
+3. 更新された `*.generated.md` と、必要なら `SKILL.md`／`gem_instructions.md` をプラットフォームのスキル・Gemに再アップロードする。
+   - `*.generated.md` を手動編集しても、次回`package.sh`実行時に上書きされる。編集は必ず正本に対して行うこと。
 
-`scripts/package.sh` 内の `RULE_FILES` 配列に1行追加するだけでよい。出力ファイル名は `scripts/make_generated_md.py` が命名規則から自動的に決める。
+新しいルールファイルを追加する場合は、`scripts/package.sh` 内の `RULE_FILES` 配列に1行追加するだけでよい。出力ファイル名は `scripts/make_generated_md.py` が命名規則から自動的に決める。
 
 ## このスキルの限界
 
@@ -58,7 +79,10 @@
 
 - 機械判定層の辞書（`GAIJI_DICT`等）はすべて例示レベルで、登録されていない語は検出できない。
 - 8カテゴリのうち、実装済みの機械判定は一部にとどまる。「送り仮名」（`checks/okurigana.py`）「文書構成・見出し」（`checks/kousei.py`）は現状ゼロ件。他のカテゴリにも個別の未実装項目がある（各`checks/*.py`のdocstring「## 未実装」節を参照）。
-- 常用漢字表外の検出は二本立て。①2,136字の公式リストを丸ごと埋め込んだ文字単位のチェック（`JOYO_KANJI`）、②個別に言い換え案を持つ辞書（`GAIJI_DICT`）。前者は網羅的だが固有名詞を誤検出するためレベルは「参考」に留めている。
+- 常用漢字表外の検出は二本立て。
+  - 2,136字の公式リストを丸ごと埋め込んだ文字単位のチェック（`JOYO_KANJI`）
+  - 個別に言い換え案を持つ辞書（`GAIJI_DICT`）
+  - 前者は網羅的だが固有名詞を誤検出するためレベルは「参考」に留めている。
 - 表外音訓（同じ漢字でも読みによって表内／表外が変わるケース）は形態素解析が必要になるため未対応。将来的に対応する場合は fugashi・unidic 等の依存追加を検討する。
 
 ### AI判断層固有の限界
@@ -66,6 +90,10 @@
 - 「判断」区分の指摘は最終的にLLMの解釈に依存するため、機械判定層ほどの再現性は保証されない。
 - URL・コードブロック・引用・固有名詞の除外はClaudeの目視確認任せで、機械的な保証がない。
 - ルール間の優先順位（要領＜社内＜個人＜案件）が矛盾を正しく検出できるかどうかも、結局はAIの解釈次第。
+
+### Gemini版固有の限界
+
+`gemini/`配下のGemini Gems向け版には、Claude Skillsの`mechanical_check.py`のようなコード実行の仕組みがない。そのため機械判定層を持ち込めず、**Gemini版はAI判断のみの簡易版**となる。機械判定層による決定的な検出を持つClaude Skills版（`claude/`）と同等の再現性は保証されないため、再現性が重要な用途ではClaude Skills版を使うこと。
 
 ### スコープ外
 
@@ -80,41 +108,44 @@
 
 - pytestで担保しているのは機械判定層のPythonコードの決定的な挙動のみで、AI判断層がSKILL.mdの指示どおりに一貫して判断するかどうかは自動テストされていない。
 
-## Gemini版について
-
-`gemini/`配下に、Gemini Gems向けの版を用意している。Gemには`claude/scripts/mechanical_check.py`のようなコード実行の仕組みがないため、機械判定層を持ち込めない。そのため**Gemini版はAI判断のみの簡易版**であり、機械判定層による決定的な検出を持つClaude Skills版（`claude/`）と同等の再現性は保証されない。再現性が重要な用途ではClaude Skills版を使うこと。
-
-Gemini版の運用手順は`gemini/gem_instructions.md`を参照。ルール正本（`rule-sources/`）は共通で、`package.sh`が`claude/references/`・`gemini/knowledge/`の両方に軽量版を生成する。
-
 ## 設計思想
 
-### 1. 解釈のブレを防ぐ — 機械層と判断層を分離する
+### 1. 解釈のブレを防ぐ — 機械判定層とAI判断層を分離する
 
-公用文の校閲ルールには「一意に判定できるもの（表記ゆれ、数字表記等）」と「文脈判断が必要なもの（専門用語の言い換え要否等）」が混在している。これを1つのLLM判断に任せると、同じ文書・同じ誤りに対して指摘が毎回ブレる。そこで、
+公用文の校閲ルールには「一意に判定できるもの（表記ゆれ、数字表記等）」と「文脈判断が必要なもの（専門用語の言い換え・説明の要否等）」が混在している。これを1つのLLM判断に任せると、同じ文書・同じ誤りに対して指摘が毎回ブレる。そこで、
 
 - 機械的に判定できるルールは`mechanical_check.py`（正規表現・辞書）で決定的に処理する
 - 文脈判断が必要なルールだけをClaudeの判断に委ねる
 
 という2層構成にし、Claudeの役割を「本当に判断が必要な部分」に絞り込んでいる。
 
-### 2. ルールファイル正本は1つだけ持ち、それ以外は自動生成する
+### 2. AI判断層向けの軽量版は、正本から自動生成し二重管理しない
 
-**手作業で2つのファイルを同期させることは、それ自体が新しい解釈のブレを生むリスク**になる。そのため、軽量版・判断用ファイルが必要な場合も、「人間が編集する正本は1つ、そこから決定的に導出される派生物」という構造を常に保っている。（`koyobun_rules.md`→`koyobun_rules.generated.md`、`mechanical_check.py`単一ファイル→`checks/`パッケージも同じ思想である。）派生物は手動編集禁止とし、ビルドスクリプトで再生成する運用にしている。
+正本（`koyobun_rules.md`等）には、機械判定層がすでに扱う「機械」区分の項目も含まれている。Claude・Geminiに正本を丸ごと読ませると、機械的に処理済みの項目まで判断対象として再解釈しかねない。機械判定層とAI判断層を分離した意味が薄れる（上記1.参照）上、コンテキストも無駄に消費する。そのため、AI判断層向けには「判断」区分だけを抜き出した軽量版が別途必要になる。
+
+**その軽量版を手作業で正本と同期させることは、それ自体が新しい解釈のブレを生むリスク**になる。そのため、軽量版・判断用ファイルが必要な場合も、「人間が編集する正本は1つ、そこから決定的に導出される派生物」という構造を常に保っている。（`koyobun_rules.md`→`koyobun_rules.generated.md`、`mechanical_check.py`単一ファイル→`checks/`パッケージも同じ思想である。）派生物は手動編集禁止とし、ビルドスクリプトで再生成する運用にしている。
 
 ### 3. 網羅性と精度はトレードオフとして扱い、無理に統合しない
 
-- 文字単位の網羅チェック（2,136字リスト）→ 検出漏れはないが、固有名詞を誤検出する
-- 辞書ベースの検出 → 誤検出はないが、登録した語しか拾えない
+- 文字単位の網羅チェック（2,136字リスト）→ 検出漏れはないが、固有名詞を誤検出する。
+- 辞書ベースの検出 → 誤検出はないが、登録した語しか拾えない。
 
 これを「どちらが正しいか」ではなく、**役割分担**（前者は「参考」レベル、後者は「要修正」レベル）として共存させている。表外音訓（読み方依存の判定）は形態素解析という大きな依存関係が必要になるため、スコープ外と明確に線引きしている。
 
-### 4. 依存を増やさない（ただし理由があれば例外にする）
+辞書（`GAIJI_DICT`・`JUGON_DICT`等）に新しい語を追加する際も、この「誤検出はない」という前提を崩さないことを基準にする。
 
-表外音訓検出のための形態素解析ライブラリや、Git LFSのような大きな依存関係は「あれば便利」ではある。ただし、特別な環境構築なしに誰でも使える、という前提条件と釣り合わないため見送っている。一方`pytest`は、標準の`unittest`より得られるテストの書きやすさ・保守性のメリットが大きいと判断し、例外的に追加している。**目的に対して妥当な複雑さか**を都度問い直す。
+- 実際の校閲で遭遇した誤用のみを追加する。使われるかどうか分からない語を先回りして登録しない。
+- 文脈に関係なく機械的に判定しても誤検出しない語に限る。`従って`（接続詞「したがって」と動詞「従う」の活用形が同形）のように読み方・品詞によって正誤が変わる語は辞書に入れず、AI判断層（`SKILL.md`の「判断」区分）に委ねる。
 
-### 5. 変更のたびに「動作が変わっていないこと」を検証する
+`rule-sources/koyobun_rules.md`の「例」列は代表例の提示にとどめ、辞書本体（実際に検出できる語のフルリスト）は`scripts/mechanical_check.py`側で管理する運用も、上記の基準を前提にしている。
+
+### 4. 変更のたびに「動作が変わっていないこと」を検証する
 
 モジュール分割、enum化など、内部構造を変える変更をする際は、変更前後で同じサンプル文書に対する出力を突き合わせる。**内容が一字一句変わっていないこと**を確認してから反映する。リファクタリングと機能変更を混ぜない。
+
+### 5. 依存を増やさない（ただし理由があれば例外にする）
+
+表外音訓検出のための形態素解析ライブラリや、Git LFSのような大きな依存関係は「あれば便利」ではある。ただし、特別な環境構築なしに誰でも使える、という前提条件と釣り合わないため見送っている。一方`pytest`は、標準の`unittest`より得られるテストの書きやすさ・保守性のメリットが大きいと判断し、例外的に追加している。**目的に対して妥当な複雑さか**を都度問い直す。
 
 ## 更新履歴
 

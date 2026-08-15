@@ -7,7 +7,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-SCRIPT_PATH = Path(__file__).parent.parent / "claude" / "scripts" / "mechanical_check.py"
+SCRIPT_PATH = (
+    Path(__file__).parent.parent / "claude" / "scripts" / "mechanical_check.py"
+)
 
 """
 -- 関数 main のテスト --

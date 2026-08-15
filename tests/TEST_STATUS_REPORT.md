@@ -1,6 +1,6 @@
 # 1. テスト実装状況
 
-- **実装済み: 26 / 26 (100%)**
+- **実装済み: 40 / 40 (100%)**
 
 - 表の ⚠️ 未実装 行を優先して対応してください。
 
@@ -56,6 +56,17 @@
 |---|---|---|---|---|
 | (module) | run | public | 2件 | ✅ |
 
+## make_generated_md.py
+
+| クラス | 関数 | 可視性 | テスト件数 | 状況 |
+|---|---|---|---|---|
+| (module) | is_table_row | public | 3件 | ✅ |
+| (module) | is_separator_row | public | 2件 | ✅ |
+| (module) | split_cells | public | 1件 | ✅ |
+| (module) | build_judgment_view | public | 3件 | ✅ |
+| (module) | filter_block | public | 6件 | ✅ |
+| (module) | main | public | 2件 | ✅ |
+
 ## mechanical_check.py
 
 | クラス | 関数 | 可視性 | テスト件数 | 状況 |
@@ -67,6 +78,19 @@
 | クラス | 関数 | 可視性 | テスト件数 | 状況 |
 |---|---|---|---|---|
 | (module) | run | public | 2件 | ✅ |
+
+## report_test_status.py
+
+| クラス | 関数 | 可視性 | テスト件数 | 状況 |
+|---|---|---|---|---|
+| (module) | parse_functions | public | 6件 | ✅ |
+| (module) | extract_doc_lines | public | 4件 | ✅ |
+| (module) | collect_test_cases | public | 4件 | ✅ |
+| (module) | collect_test_counts | public | 1件 | ✅ |
+| (module) | build_status_section | public | 3件 | ✅ |
+| (module) | build_test_case_section | public | 1件 | ✅ |
+| (module) | build_report | public | 1件 | ✅ |
+| (module) | main | public | 2件 | ✅ |
 
 ## suuji.py
 
@@ -304,6 +328,53 @@
 |---|---|---|
 | 1 | 正常 | 検出条件を満たすtextを渡すと対応するrule_idがすべてfindingsに含まれる |
 
+## test_make_generated_md.py — make_generated_md::is_table_row
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | 通常のテーブル行は真を返す |
+| 2 | 正常 | 区切り行は偽を返す |
+| 3 | 正常 | テーブル行でない文字列は偽を返す |
+
+## test_make_generated_md.py — make_generated_md::is_separator_row
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | 区切り行（位置指定のコロン付き含む）は真を返す |
+| 2 | 正常 | 通常のデータ行は偽を返す |
+
+## test_make_generated_md.py — make_generated_md::split_cells
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | 先頭・末尾の「|」を除き、セルごとに分割してstripした文字列のリストを返す |
+
+## test_make_generated_md.py — make_generated_md::filter_block
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | 見出しに「凡例」を含む場合、ブロックをそのまま返す |
+| 2 | 正常 | 見出しに「今後の拡張予定」を含む場合、ブロックをそのまま返す |
+| 3 | 正常 | 表を含まないブロック（説明文のみ）はそのまま返す |
+| 4 | 正常 | 種別列を持つ表では、「判断」で始まる行だけが残る |
+| 5 | 正常 | 判断行が1件も無い場合はNoneを返す |
+| 6 | 正常 | 種別列が無い表は、全データ行がそのまま残る |
+
+## test_make_generated_md.py — make_generated_md::build_judgment_view
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | 最初の見出しより前のヘッダー部分はそのまま引き継がれる |
+| 2 | 正常 | 判断行が0件のセクションは出力から除外される |
+| 3 | 正常 | 複数セクションを含む場合、各セクションが独立してフィルタされる |
+
+## test_make_generated_md.py — make_generated_md::main
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | 正本ファイルを渡すと、対応する.generated.mdがclaude/references/に生成される |
+| 2 | 異常 | 引数の数が1つでない場合、使い方メッセージを標準エラーに出力し終了コード1で終了する |
+
 ## test_mechanical_check.py — mechanical_check::main
 
 | # | 種別 | 説明 |
@@ -312,4 +383,66 @@
 | 2 | 正常 | 検出対象がない（空文字列の）ファイルを渡すと、空のJSON配列が標準出力に出力される |
 | 3 | 異常 | 引数を渡さない場合、使い方メッセージが標準エラーに出力され、終了コード1で終了する |
 | 4 | 異常 | 引数を2つ以上渡した場合、使い方メッセージが標準エラーに出力され、終了コード1で終了する |
+
+## test_report_test_status.py — report_test_status::parse_functions
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | モジュール直下の関数は、class_nameがNone・match_keyがモジュール名になる |
+| 2 | 正常 | クラス内の関数は、class_nameがクラス名になる |
+| 3 | 正常 | 関数内で定義されたローカル関数は対象外 |
+| 4 | 正常 | 先頭がアンダースコア1つの関数はvis="private"になる |
+| 5 | 正常 | ダンダーメソッドはvis="public"になる |
+| 6 | 正常 | __init__.pyの場合、match_keyは親ディレクトリ名になる |
+
+## test_report_test_status.py — report_test_status::extract_doc_lines
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | モジュールdocstringの各行が抽出される |
+| 2 | 正常 | 関数docstringの各行も抽出される |
+| 3 | 正常 | #コメントの中身も抽出される |
+| 4 | 正常 | 複数の文字列リテラル文・コメントが、ファイル中の出現順に並ぶ |
+
+## test_report_test_status.py — report_test_status::collect_test_cases
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | 見出し行に続くケース行が正しく抽出される |
+| 2 | 正常 | 継続行（次のケース行・見出し行・空行が現れるまで）が同じケースの説明に連結される |
+| 3 | 正常 | 同じ(file, class, fn, num)の重複記載は1件にまとめられる |
+| 4 | 正常 | 見出しが無い状態のケース行は無視される |
+
+## test_report_test_status.py — report_test_status::collect_test_counts
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | (class_name, fn)ごとのケース件数を正しく集計する |
+
+## test_report_test_status.py — report_test_status::build_status_section
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | テストが存在する関数は状況が✅になり、件数が表示される |
+| 2 | 正常 | テストが存在しない関数は状況が⚠️未実装になる |
+| 3 | 正常 | 実装済み件数・全体件数・パーセンテージが正しく計算される |
+
+## test_report_test_status.py — report_test_status::build_test_case_section
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | ケースが(file, class, fn)ごとにグループ化され、番号順に並ぶ |
+
+## test_report_test_status.py — report_test_status::build_report
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | テスト実装状況セクションとテストケース一覧セクションを、空行区切りで連結した文字列を返す |
+
+## test_report_test_status.py — report_test_status::main
+
+| # | 種別 | 説明 |
+|---|---|---|
+| 1 | 正常 | 引数なしで実行すると、標準出力にレポートが出力される |
+| 2 | 正常 | -oオプションでファイルパスを指定すると、そのファイルにレポートが書き出される |
 

@@ -2,7 +2,7 @@
 """
 関数一覧とテストの`docstring`を読み取り、テスト実装状況を表として出力する。
 
-対象は `claude/scripts/` 以下のソースと `tests/` 以下のテストコード。
+対象は `claude/scripts/`・`scripts/` 以下のソースと `tests/` 以下のテストコード。
 
 ## テストケースの記法
 
@@ -40,7 +40,7 @@ from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-SRC_DIR = ROOT / "claude" / "scripts"
+SRC_DIRS = [ROOT / "claude" / "scripts", ROOT / "scripts"]
 TESTS_DIR = ROOT / "tests"
 
 # テスト不要な特殊関数
@@ -282,7 +282,7 @@ def build_test_case_section(test_paths: list[Path]) -> str:
 
 
 def build_report() -> str:
-    src_paths = sorted(SRC_DIR.rglob("*.py"))
+    src_paths = sorted(p for d in SRC_DIRS for p in d.rglob("*.py"))
     test_paths = sorted(TESTS_DIR.rglob("*.py"))
     status = build_status_section(src_paths, test_paths)
     cases = build_test_case_section(test_paths)
