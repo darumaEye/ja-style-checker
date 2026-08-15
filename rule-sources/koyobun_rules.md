@@ -1,7 +1,16 @@
 # 公用文ルール（「公用文作成の考え方（建議）」ベース）
 
-出典：文化審議会建議「公用文作成の考え方」（付）「公用文作成の考え方（文化審議会建議）」解説（令和4年1月7日）
-（旧版：文化審議会国語分科会「新しい『公用文作成の要領』に向けて（報告）」令和3年3月12日）
+出典：
+- 建議「公用文作成の考え方」（付）「公用文作成の考え方（文化審議会建議）」解説（文化審議会、令和4年1月7日）
+  - PDF：https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/93651301_01.pdf
+  - 掲載ページ：https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/93657201.html
+- （旧版）報告「新しい『公用文作成の要領』に向けて」（文化審議会国語分科会、令和3年3月12日）
+  - PDF：https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/93098001_01.pdf
+- 一覧ページ：「報告・答申・建議等」（文化庁）https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/
+
+（2026年8月15日に利用）
+
+上記を加工し、機械判定・AI判断向けのルール一覧表として本プロジェクトが独自に作成。文化庁・文化審議会が作成したものではない。
 
 凡例
 - 種別
