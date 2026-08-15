@@ -8,8 +8,9 @@ __pycache__/
 # Python仮想環境
 .venv/
 
-# 作業用スクラッチディレクトリ
-workings/
+# 作業用スクラッチディレクトリ（.gitkeepだけは追跡してディレクトリ自体を残す）
+workings/*
+!workings/.gitkeep
 
 # Claude Codeのローカル設定
 .claude/settings.local.json
