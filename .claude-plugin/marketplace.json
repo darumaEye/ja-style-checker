@@ -1,0 +1,26 @@
+{
+  "name": "ja-style-checker-marketplace",
+  "owner": {
+    "name": "darumaEye"
+  },
+  "description": "文化審議会建議「公用文作成の考え方」に基づく日本語文書の表記を校閲するスキル",
+  "plugins": [
+    {
+      "name": "ja-style-checker",
+      "displayName": "日本語スタイルチェッカー",
+      "description": "文化審議会建議「公用文作成の考え方」（令和4年1月7日）に基づいて日本語文書の表記を校閲する。機械判定層（正規表現・辞書ベース）とAI判断層の2層構成で、同じ文書に対する指摘のブレを抑える。",
+      "version": "1.0.0",
+      "author": {
+        "name": "darumaEye"
+      },
+      "homepage": "https://github.com/darumaEye/ja-style-checker",
+      "repository": "https://github.com/darumaEye/ja-style-checker",
+      "license": "MIT",
+      "keywords": ["日本語", "校閲", "校正", "公用文", "文書", "claude-skill"],
+      "category": "writing",
+      "source": "./",
+      "skills": ["./claude"],
+      "strict": false
+    }
+  ]
+}
