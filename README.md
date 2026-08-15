@@ -27,7 +27,7 @@
 | `tests/test_status_report.md` | `report_test_status.py`が生成するテスト実装状況表 |
 | `pytest.ini` | pytestの設定（importパス・テスト探索対象） |
 | `requirements.txt` | 開発用のPython依存関係（black, pytest等） |
-| `samples/` | 動作確認用のサンプル文書（.docx等）。スキルの手動テストに使う |
+| `samples/` | 動作確認用の架空のサンプル文書。スキルの手動テストに使う |
 
 ## 正本／自動生成の関係
 
