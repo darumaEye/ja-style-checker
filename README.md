@@ -150,3 +150,7 @@ ja-style-checker/
 ## 更新履歴
 
 ルール内容の変更履歴は `CHANGELOG.md` を参照。
+
+## ライセンス
+
+コード（`claude/scripts/`・`scripts/`・テスト等）は`LICENSE`（MIT License）の対象。`rule-sources/`配下のルール表および`claude/references/`・`gemini/knowledge/`の生成物は対象外で、文化庁「公用文作成の考え方」（建議）を出典とし、政府標準利用規約に基づき利用している（詳細は`rule-sources/koyobun_rules.md`の出典表記を参照）。
